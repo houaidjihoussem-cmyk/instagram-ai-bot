@@ -40,16 +40,46 @@ Before running the launcher, make sure you have:
 
 ---
 
-## ⚡ Quick Start (Local Setup)
+## ⚡ Quick Start guides
 
+### Windows Setup
 1. Open the project folder.
 2. Double-click the **[run.bat](file:///c:/Users/RDP/Downloads/instagram-ai-bot/run.bat)** file.
-3. The setup script will automatically:
-   - Check your Python installation.
-   - Create a Python virtual environment (`.venv`).
-   - Install all required packages (`fastapi`, `uvicorn`, `requests`, `google-generativeai`, `openai`, `pyngrok`, `pydantic`).
-   - Open the web dashboard in your default browser at `http://localhost:8000`.
-   - Start the local FastAPI server.
+3. The launcher will set up your environment, install requirements, and open `http://localhost:8000` in your browser.
+
+### Android Setup (Termux)
+You can run this bot directly on your Android phone using the free **Termux** app:
+1. Download and open **Termux** on your Android device.
+2. Update packages and install Git and Python by running:
+   ```bash
+   pkg update && pkg install git python -y
+   ```
+3. Clone the repository:
+   ```bash
+   git clone https://github.com/houaidjihoussem-cmyk/instagram-ai-bot.git
+   ```
+4. Navigate to the project directory:
+   ```bash
+   cd instagram-ai-bot
+   ```
+5. Grant execution permission and launch the setup:
+   ```bash
+   chmod +x run.sh && ./run.sh
+   ```
+6. Open your mobile browser and go to `http://localhost:8000` to configure the bot.
+
+### macOS & Linux Setup
+1. Open your terminal.
+2. Clone the repository:
+   ```bash
+   git clone https://github.com/houaidjihoussem-cmyk/instagram-ai-bot.git
+   cd instagram-ai-bot
+   ```
+3. Grant execution permission and run the launcher:
+   ```bash
+   chmod +x run.sh && ./run.sh
+   ```
+4. Open `http://localhost:8000` in your web browser.
 
 ---
 
