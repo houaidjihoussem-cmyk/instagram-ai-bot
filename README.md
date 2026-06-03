@@ -168,3 +168,13 @@ Since Meta webhooks require a public HTTPS URL, local servers (`http://localhost
 
 #### Q: I get a `UnicodeEncodeError` or crash on my Windows terminal.
 - The terminal runner in this project is configured to override standard output to `UTF-8` automatically on Windows. If you still encounter crashes, ensure your system supports UTF-8, or try launching the bot directly using the `run.bat` launcher.
+
+---
+
+## ⚠️ Disclaimer
+
+This application is an independent open-source project and is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Meta Platforms, Inc. (Facebook, Instagram), Google LLC, OpenAI, or Ngrok.
+
+- **API Costs**: Integrating third-party APIs (such as Google Gemini, OpenAI, or Ngrok) may incur usage fees depending on your billing tier and transaction volume. You are solely responsible for monitoring and managing your API keys, usage limits, and billing.
+- **Account Safety & Policies**: Social media automation is subject to Meta's Developer Terms and Instagram's Community Guidelines. Automated bulk messaging, unsolicited spamming, or violating platform policies can lead to temporary or permanent account suspension, or loss of API access. Use this software responsibly.
+- **No Warranty**: This software is provided "as is", without warranty of any kind, express or implied. The author shall not be held liable for any damages or account limitations resulting from the use of this software.
