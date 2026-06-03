@@ -117,6 +117,49 @@
             }
         }
 
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+                gap: 16px;
+            }
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+                padding: 16px 20px;
+            }
+            .status-indicators {
+                width: 100%;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .status-pill {
+                flex-grow: 1;
+                justify-content: center;
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .tabs {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .tab-btn {
+                font-size: 13px;
+                padding: 8px 4px;
+            }
+            .glass-panel {
+                padding: 16px;
+                gap: 16px;
+            }
+            .logo-section h1 {
+                font-size: 22px;
+            }
+        }
+
         /* Panel Common */
         .glass-panel {
             background: var(--panel-bg);
