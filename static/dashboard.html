@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InstaAI Bot Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0d13;
+            --panel-bg: rgba(20, 24, 37, 0.6);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --primary-accent: #9d4edd;
+            --secondary-accent: #00f5d4;
+            --error-accent: #ff007f;
+            --text-color: #f1f3f9;
+            --text-muted: #8b9bb4;
+            --font-main: 'Outfit', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(157, 78, 221, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(0, 245, 212, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .logo-section h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-section p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .status-indicators {
+            display: flex;
+            gap: 16px;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--text-muted);
+        }
+
+        .status-dot.active {
+            background-color: var(--secondary-accent);
+            box-shadow: 0 0 10px var(--secondary-accent);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.inactive {
+            background-color: var(--error-accent);
+            box-shadow: 0 0 10px var(--error-accent);
+        }
+
+        /* Layout Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 24px;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panel Common */
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Forms */
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        input[type="text"], input[type="password"], select, textarea {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-family: var(--font-main);
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-accent);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 10px rgba(157, 78, 221, 0.2);
+        }
+
+        .checkbox-group {
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+        }
+
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary-accent);
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary-accent), #7b2cbf);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(157, 78, 221, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Secondary Button */
+        button.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        button.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--text-muted);
+            box-shadow: none;
+        }
+
+        /* Webhook Card & Instructions */
+        .info-card {
+            background: rgba(157, 78, 221, 0.06);
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .info-card-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--primary-accent);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .url-box {
+            display: flex;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .url-text {
+            flex-grow: 1;
+            padding: 10px 14px;
+            font-family: monospace;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow-x: auto;
+            align-self: center;
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 1px solid var(--border-color);
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+            border-radius: 0;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Tabs and Logs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            gap: 16px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            color: var(--secondary-accent);
+            border-bottom-color: var(--secondary-accent);
+        }
+
+        .tab-btn:hover {
+            color: var(--text-color);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: 520px;
+            padding-right: 4px;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        /* Log items */
+        .log-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 13px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-sender {
+            font-weight: 600;
+            color: var(--secondary-accent);
+        }
+
+        .log-time {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        .log-message {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-accent);
+        }
+
+        .log-response {
+            background: rgba(157, 78, 221, 0.05);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--secondary-accent);
+            margin-top: 4px;
+        }
+
+        .log-empty {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px 0;
+            font-style: italic;
+        }
+
+        /* Setup Steps Documentation */
+        .setup-guide {
+            font-size: 14px;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .setup-guide h3 {
+            color: var(--secondary-accent);
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .setup-guide ol {
+            padding-left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .setup-guide li strong {
+            color: var(--primary-accent);
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1c2130;
+            border: 1px solid var(--primary-accent);
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            transform: translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .toast.success {
+            border-color: var(--secondary-accent);
+        }
+
+        .toast.error {
+            border-color: var(--error-accent);
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(15px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Utility classes */
+        .d-none { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="logo-section">
+            <h1>InstaAI Responder</h1>
+            <p>Official Instagram Creator API AI Auto-Responder</p>
+        </div>
+        <div class="status-indicators">
+            <div class="status-pill">
+                <span>Webhook:</span>
+                <span id="webhook-status" class="status-dot active"></span>
+            </div>
+            <div class="status-pill">
+                <span>Tunnel:</span>
+                <span id="tunnel-status" class="status-dot"></span>
+            </div>
+            <div class="status-pill">
+                <span>Instagram API:</span>
+                <span id="ig-status" class="status-dot"></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content Grid -->
+    <div class="dashboard-grid">
+        
+        <!-- Left: Configuration Form -->
+        <div class="glass-panel">
+            <h2 class="panel-title">⚙️ Bot Settings</h2>
+            
+            <form id="settings-form" class="form-section">
+                
+                <!-- Instagram Config -->
+                <h3 style="color: var(--secondary-accent); font-size: 15px; margin-top: 5px;">Instagram Creator API</h3>
+                
+                <div class="form-group">
+                    <label for="instagram_access_token">Instagram / Facebook Page Access Token</label>
+                    <input type="password" id="instagram_access_token" placeholder="EAAW..." required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="instagram_account_id">Instagram Account ID</label>
+                        <input type="text" id="instagram_account_id" placeholder="1784..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="webhook_verify_token">Webhook Verify Token</label>
+                        <input type="text" id="webhook_verify_token" required>
+                    </div>
+                </div>
+
+                <!-- Tunnel Config -->
+                <h3 style="color: var(--secondary-accent); font-size: 15px; margin-top: 10px;">Ngrok Auto-Tunnel</h3>
+                
+                <div class="form-group">
+                    <label for="ngrok_auth_token">Ngrok Authtoken (Optional)</label>
+                    <input type="password" id="ngrok_auth_token" placeholder="2aB...">
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="use_auto_tunnel">
+                    <label for="use_auto_tunnel">Automatically start ngrok tunnel on startup</label>
+                </div>
+
+                <!-- AI Provider Config -->
+                <h3 style="color: var(--secondary-accent); font-size: 15px; margin-top: 10px;">AI Model Configuration</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ai_provider">AI Provider</label>
+                        <select id="ai_provider" onchange="toggleAIProviderFields()">
+                            <option value="gemini">Google Gemini</option>
+                            <option value="openai">OpenAI</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Gemini Models -->
+                    <div class="form-group ai-field gemini-field">
+                        <label for="gemini_model">Gemini Model</label>
+                        <select id="gemini_model">
+                            <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                            <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                            <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash</option>
+                        </select>
+                    </div>
+                    
+                    <!-- OpenAI Models -->
+                    <div class="form-group ai-field openai-field d-none">
+                        <label for="openai_model">OpenAI Model</label>
+                        <select id="openai_model">
+                            <option value="gpt-4o">GPT-4o</option>
+                            <option value="gpt-4o-mini">GPT-4o-mini</option>
+                            <option value="gpt-3.5-turbo">GPT-3.5-turbo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group ai-field gemini-field">
+                    <label for="gemini_api_key">Gemini API Key</label>
+                    <input type="password" id="gemini_api_key" placeholder="AIzaSy...">
+                </div>
+
+                <div class="form-group ai-field openai-field d-none">
+                    <label for="openai_api_key">OpenAI API Key</label>
+                    <input type="password" id="openai_api_key" placeholder="sk-proj-...">
+                </div>
+
+                <div class="form-group">
+                    <label for="system_prompt">AI Persona & System Prompt</label>
+                    <textarea id="system_prompt" rows="3" placeholder="Instruct the bot how to behave..."></textarea>
+                </div>
+
+                <button type="submit">💾 Save Configurations</button>
+            </form>
+
+            <!-- Test Section -->
+            <h3 style="color: var(--secondary-accent); font-size: 15px; margin-top: 10px;">🧪 Test Bot (Simulate Webhook)</h3>
+            <div class="form-row">
+                <input type="text" id="test_sender_id" placeholder="Simulated Instagram User ID (e.g. 98765)" style="padding: 10px;">
+                <input type="text" id="test_message" placeholder="Type test message..." style="padding: 10px;">
+            </div>
+            <button class="secondary" onclick="simulateIncomingMessage()">🚀 Send Mock Message Event</button>
+        </div>
+
+        <!-- Right: Logs & Guides -->
+        <div class="glass-panel">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('logs-tab')">💬 Live Log Feed</button>
+                <button class="tab-btn" onclick="switchTab('guide-en-tab')">📘 Setup Guide</button>
+            </div>
+
+            <!-- Tab: Logs -->
+            <div id="logs-tab" class="tab-content active">
+                <div class="info-card">
+                    <div class="info-card-title">
+                        <span>📡 Webhook URLs</span>
+                        <span id="tunnel-url-badge" style="font-size: 11px; color: var(--secondary-accent)">Local</span>
+                    </div>
+                    <p style="font-size: 12px; color: var(--text-muted);">Configure these inside the Facebook Developer Settings under the Instagram Webhook section.</p>
+                    <div class="url-box">
+                        <span class="url-text" id="display-webhook-url">http://localhost:8000/webhook</span>
+                        <button class="copy-btn" onclick="copyText('display-webhook-url')">Copy URL</button>
+                    </div>
+                    <div class="url-box">
+                        <span class="url-text" id="display-verify-token">Verify Token: loading...</span>
+                        <button class="copy-btn" onclick="copyText('display-verify-token', true)">Copy Token</button>
+                    </div>
+                </div>
+
+                <div id="logs-list" style="display: flex; flex-direction: column; gap: 12px;">
+                    <!-- Logs populated here -->
+                    <div class="log-empty">No activity logged yet. Send a message to start.</div>
+                </div>
+            </div>
+
+
+            <!-- Tab: English Guide -->
+            <div id="guide-en-tab" class="tab-content">
+                <div class="setup-guide">
+                    <h3>🚀 Getting Started with Instagram Creator API</h3>
+                    <p>Follow these steps to connect your official Instagram account to the bot:</p>
+                    
+                    <ol>
+                        <li><strong>Convert to Creator/Business Account:</strong>
+                            <br>Open Instagram App, go to Settings & Privacy -> Creator/Business tools -> switch to a Creator or Business account.
+                        </li>
+                        <li><strong>Enable Message Access (Crucial Mobile Setting):</strong>
+                            <br>In your Instagram mobile app, go to <strong>Settings and Privacy</strong> -> <strong>Messages and Story Replies</strong> -> <strong>Message Controls</strong>. Under <strong>Connected Tools</strong>, toggle <strong>"Allow Access to Messages"</strong> to <strong>ON</strong>. Without this, Meta will block all replies.
+                        </li>
+                        <li><strong>Link Instagram to a Facebook Page:</strong>
+                            <br>Create a Facebook Page and link your Instagram account via the Page settings.
+                        </li>
+                        <li><strong>Create a Facebook Developer App:</strong>
+                            <br>Go to the <a href="https://developers.facebook.com/" target="_blank" style="color:var(--secondary-accent);">Facebook Developers Portal</a>, create a new app, select <strong>Other</strong> -> <strong>Business</strong>.
+                        </li>
+                        <li><strong>Add Instagram Graph API Product:</strong>
+                            <br>In your app dashboard, find and add <strong>Instagram Graph API</strong>.
+                        </li>
+                        <li><strong>Generate Page Access Token & Extend it:</strong>
+                            <br>Use the Graph API Explorer to generate a token for your connected Facebook Page. Ensure these permissions are checked:
+                            <br><code style="color:var(--secondary-accent); font-size:12px; background:rgba(0,0,0,0.2); padding:2px 6px; border-radius:4px;">instagram_basic, instagram_manage_messages, pages_manage_metadata, pages_show_list</code>
+                            <br><em>To prevent token expiration in 2 hours:</em> Click the **ⓘ Info** icon next to the generated access token, click **Open in Access Token Tool**, then click **Extend Access Token** to get a 60-day long-lived token.
+                            <br>Copy this token into the **Access Token** field.
+                        </li>
+                        <li><strong>Configure Webhooks:</strong>
+                            <br>Copy the Webhook URL and Webhook Verify Token from this dashboard.
+                            <br>Paste them into the Instagram Webhook section of your Facebook Developer App.
+                            <br>Subscribe to the <strong>messages</strong> event.
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Toast Notification Element -->
+    <div id="toast" class="toast">
+        <span id="toast-text">Settings Saved!</span>
+    </div>
+
+    <script>
+        // Toggle AI Provider Fields based on dropdown
+        function toggleAIProviderFields() {
+            const provider = document.getElementById("ai_provider").value;
+            const geminiFields = document.querySelectorAll(".gemini-field");
+            const openaiFields = document.querySelectorAll(".openai-field");
+
+            if (provider === "gemini") {
+                geminiFields.forEach(el => el.classList.remove("d-none"));
+                openaiFields.forEach(el => el.classList.add("d-none"));
+            } else {
+                geminiFields.forEach(el => el.classList.add("d-none"));
+                openaiFields.forEach(el => el.classList.remove("d-none"));
+            }
+        }
+
+        // Switch Tabs
+        function switchTab(tabId) {
+            document.querySelectorAll(".tab-content").forEach(tab => {
+                tab.classList.remove("active");
+            });
+            document.querySelectorAll(".tab-btn").forEach(btn => {
+                btn.classList.remove("active");
+            });
+
+            document.getElementById(tabId).classList.add("active");
+            
+            // Find button that contains matching onclick argument
+            const buttons = document.querySelectorAll(".tab-btn");
+            for (let btn of buttons) {
+                if (btn.getAttribute("onclick").includes(tabId)) {
+                    btn.classList.add("active");
+                }
+            }
+        }
+
+        // Copy Text Helpers
+        function copyText(elementId, cleanToken = false) {
+            let textToCopy = document.getElementById(elementId).innerText;
+            if (cleanToken) {
+                // If it's the verify token, strip "Verify Token: " prefix
+                textToCopy = textToCopy.replace("Verify Token: ", "");
+            }
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showToast("Copied to clipboard!", "success");
+            }).catch(() => {
+                showToast("Failed to copy", "error");
+            });
+        }
+
+        // Show Toast
+        function showToast(message, type = "success") {
+            const toast = document.getElementById("toast");
+            const toastText = document.getElementById("toast-text");
+            toastText.innerText = message;
+            
+            toast.className = "toast show " + type;
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+        }
+
+        // Fetch settings from API
+        async function fetchSettings() {
+            try {
+                const res = await fetch("/api/settings");
+                const config = await res.json();
+                
+                document.getElementById("instagram_access_token").value = config.instagram_access_token || "";
+                document.getElementById("instagram_account_id").value = config.instagram_account_id || "";
+                document.getElementById("webhook_verify_token").value = config.webhook_verify_token || "insta_bot_verify_token_123";
+                document.getElementById("ngrok_auth_token").value = config.ngrok_auth_token || "";
+                document.getElementById("use_auto_tunnel").checked = !!config.use_auto_tunnel;
+                document.getElementById("ai_provider").value = config.ai_provider || "gemini";
+                document.getElementById("gemini_model").value = config.gemini_model || "gemini-1.5-flash";
+                document.getElementById("openai_model").value = config.openai_model || "gpt-4o";
+                document.getElementById("gemini_api_key").value = config.gemini_api_key || "";
+                document.getElementById("openai_api_key").value = config.openai_api_key || "";
+                document.getElementById("system_prompt").value = config.system_prompt || "";
+
+                document.getElementById("display-verify-token").innerText = "Verify Token: " + (config.webhook_verify_token || "insta_bot_verify_token_123");
+
+                toggleAIProviderFields();
+            } catch (err) {
+                console.error("Error fetching settings:", err);
+                showToast("Could not load settings from server.", "error");
+            }
+        }
+
+        // Save Settings to API
+        document.getElementById("settings-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            
+            const payload = {
+                instagram_access_token: document.getElementById("instagram_access_token").value,
+                instagram_account_id: document.getElementById("instagram_account_id").value,
+                webhook_verify_token: document.getElementById("webhook_verify_token").value,
+                ngrok_auth_token: document.getElementById("ngrok_auth_token").value,
+                use_auto_tunnel: document.getElementById("use_auto_tunnel").checked,
+                ai_provider: document.getElementById("ai_provider").value,
+                gemini_model: document.getElementById("gemini_model").value,
+                openai_model: document.getElementById("openai_model").value,
+                gemini_api_key: document.getElementById("gemini_api_key").value,
+                openai_api_key: document.getElementById("openai_api_key").value,
+                system_prompt: document.getElementById("system_prompt").value,
+            };
+
+            try {
+                const res = await fetch("/api/settings", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (res.ok) {
+                    showToast("Configurations saved successfully!", "success");
+                    document.getElementById("display-verify-token").innerText = "Verify Token: " + payload.webhook_verify_token;
+                    // Trigger a status and tunnel refresh
+                    setTimeout(fetchStatus, 1000);
+                } else {
+                    const err = await res.json();
+                    showToast("Error saving: " + (err.detail || "Server Error"), "error");
+                }
+            } catch (err) {
+                showToast("Network error while saving settings.", "error");
+            }
+        });
+
+        // Fetch Status & Tunnel Info
+        async function fetchStatus() {
+            try {
+                const res = await fetch("/api/status");
+                const status = await res.json();
+
+                // Set tunnel status
+                const tunnelStatus = document.getElementById("tunnel-status");
+                const tunnelUrlBadge = document.getElementById("tunnel-url-badge");
+                const displayWebhookUrl = document.getElementById("display-webhook-url");
+
+                if (status.tunnel_url) {
+                    tunnelStatus.className = "status-dot active";
+                    tunnelUrlBadge.innerText = "Tunnel Online";
+                    tunnelUrlBadge.style.color = "var(--secondary-accent)";
+                    displayWebhookUrl.innerText = status.tunnel_url + "/webhook";
+                } else {
+                    tunnelStatus.className = "status-dot";
+                    tunnelUrlBadge.innerText = "Local Only";
+                    tunnelUrlBadge.style.color = "var(--text-muted)";
+                    displayWebhookUrl.innerText = window.location.origin + "/webhook";
+                }
+
+                // Set IG Status
+                const igStatus = document.getElementById("ig-status");
+                if (status.ig_token_configured) {
+                    igStatus.className = "status-dot active";
+                } else {
+                    igStatus.className = "status-dot inactive";
+                }
+
+            } catch (err) {
+                console.error("Error fetching status:", err);
+            }
+        }
+
+        // Fetch Logs
+        async function fetchLogs() {
+            try {
+                const res = await fetch("/api/logs");
+                const logs = await res.json();
+                const logsList = document.getElementById("logs-list");
+
+                if (logs.length === 0) {
+                    logsList.innerHTML = `<div class="log-empty">No activity logged yet. Send a message to start.</div>`;
+                    return;
+                }
+
+                let html = "";
+                logs.forEach(log => {
+                    html += `
+                        <div class="log-item">
+                            <div class="log-header">
+                                <span class="log-sender">👤 Sender ID: ${log.sender_id}</span>
+                                <span class="log-time">${log.timestamp}</span>
+                            </div>
+                            <div class="log-message">
+                                <strong>Message:</strong> ${log.message_text}
+                            </div>
+                            <div class="log-response">
+                                <strong>AI Response:</strong> ${log.response_text}
+                            </div>
+                        </div>
+                    `;
+                });
+                logsList.innerHTML = html;
+            } catch (err) {
+                console.error("Error fetching logs:", err);
+            }
+        }
+
+        // Simulate incoming webhook message
+        async function simulateIncomingMessage() {
+            const senderId = document.getElementById("test_sender_id").value || "12345";
+            const messageText = document.getElementById("test_message").value;
+
+            if (!messageText) {
+                showToast("Please enter a test message text.", "error");
+                return;
+            }
+
+            // Prepare mock Instagram webhook event payload
+            const mockPayload = {
+                object: "instagram",
+                entry: [{
+                    id: "mock_page_id",
+                    time: Math.floor(Date.now() / 1000),
+                    messaging: [{
+                        sender: { id: senderId },
+                        recipient: { id: "mock_page_id" },
+                        timestamp: Date.now(),
+                        message: {
+                            mid: "mock_message_id_" + Math.random().toString(36).substr(2, 9),
+                            text: messageText
+                        }
+                    }]
+                }]
+            };
+
+            try {
+                showToast("Sending mock message webhook...", "success");
+                const res = await fetch("/webhook", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(mockPayload)
+                });
+                
+                if (res.ok) {
+                    showToast("Webhook event processed!", "success");
+                    document.getElementById("test_message").value = "";
+                    // Immediately fetch logs
+                    fetchLogs();
+                } else {
+                    const text = await res.text();
+                    showToast("Simulate failed: " + text, "error");
+                }
+            } catch (err) {
+                showToast("Failed to simulate message.", "error");
+            }
+        }
+
+        // Initial Load and Polling
+        fetchSettings();
+        fetchStatus();
+        fetchLogs();
+
+        // Poll status and logs every 3 seconds
+        setInterval(() => {
+            fetchStatus();
+            fetchLogs();
+        }, 3000);
+
+    </script>
+</body>
+</html>
